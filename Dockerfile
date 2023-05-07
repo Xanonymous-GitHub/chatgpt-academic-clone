@@ -2,7 +2,9 @@
 FROM python:slim AS base
 
 # Set up a non-root user and working directory
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup --system appgroup \
+    && adduser --system --no-create-home --ingroup appgroup appuser
+
 USER appuser
 WORKDIR /app
 
