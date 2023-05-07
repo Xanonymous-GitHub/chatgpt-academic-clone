@@ -12,7 +12,10 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt --no-cache-dir
+RUN export PATH=$PATH:/home/appuser/.local/bin \
+    && export PYTHONPATH=$PYTHONPATH:/app \
+    && export PATH=$PATH:/app \
+    && pip install --trusted-host pypi.python.org -r requirements.txt --no-cache-dir
 
 # Use multistage build to create a separate build stage
 FROM base AS builder
@@ -29,6 +32,7 @@ COPY --from=builder --chown=appuser:appgroup /app /app
 # Set the environment variables
 ENV API_KEY=${API_KEY}
 ENV LLM_MODEL=${LLM_MODEL}
+ENV WEB_PORT=${WEB_PORT}
 
 # Make the container executable and run the application
 ENTRYPOINT ["python3"]
