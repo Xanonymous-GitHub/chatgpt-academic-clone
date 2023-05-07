@@ -10,6 +10,10 @@ WORKDIR /app
 
 # Copy only the necessary files for dependency installation
 COPY requirements.txt .
+COPY request_llm/requirements_newbing.txt ./request_llm
+COPY request_llm/requirements_moss.txt ./request_llm
+COPY request_llm/requirements_jittorllms.txt ./request_llm
+COPY request_llm/requirements_chatglm.txt ./request_llm
 
 # Install any needed packages specified in requirements.txt
 RUN export PATH=$PATH:/home/appuser/.local/bin \
