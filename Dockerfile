@@ -3,7 +3,7 @@ FROM python:slim AS base
 
 # Set up a non-root user and working directory
 RUN addgroup --system appgroup \
-    && adduser --system --no-create-home --ingroup appgroup appuser
+    && adduser --system --ingroup appgroup appuser
 
 USER appuser
 WORKDIR /app
