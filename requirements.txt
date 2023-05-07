@@ -16,6 +16,4 @@ numpy
 arxiv
 pymupdf
 torch
-torchvision
-torchaudio
 tensorflow
