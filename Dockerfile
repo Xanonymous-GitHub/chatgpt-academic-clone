@@ -1,20 +1,33 @@
-# 此Dockerfile适用于“无本地模型”的环境构建，如果需要使用chatglm等本地模型，请参考 docs/Dockerfile+ChatGLM
-# 如何构建: 先修改 `config.py`， 然后 docker build -t gpt-academic .
-# 如何运行: docker run --rm -it --net=host gpt-academic
-FROM python:3.11
+# Use an official Python runtime as a parent image
+FROM python:slim AS base
 
-RUN echo '[global]' > /etc/pip.conf && \
-    echo 'index-url = https://mirrors.aliyun.com/pypi/simple/' >> /etc/pip.conf && \
-    echo 'trusted-host = mirrors.aliyun.com' >> /etc/pip.conf
+# Set up a non-root user and working directory
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+WORKDIR /app
 
-
-WORKDIR /gpt
+# Copy only the necessary files for dependency installation
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
 
-COPY . .
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt --no-cache-dir
 
-# 可选步骤，用于预热模块
-RUN python3  -c 'from check_proxy import warm_up_modules; warm_up_modules()'
+# Use multistage build to create a separate build stage
+FROM base AS builder
 
-CMD ["python3", "-u", "main.py"]
+# Copy the rest of the application code
+COPY --chown=appuser:appgroup . .
+
+# Switch back to the base image
+FROM base
+
+# Copy the compiled application from the builder stage
+COPY --from=builder --chown=appuser:appgroup /app /app
+
+# Set the environment variables
+ENV API_KEY=${API_KEY}
+ENV LLM_MODEL=${LLM_MODEL}
+
+# Make the container executable and run the application
+ENTRYPOINT ["python3"]
+CMD ["main.py"]
