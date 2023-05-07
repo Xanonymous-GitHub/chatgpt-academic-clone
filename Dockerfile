@@ -15,7 +15,11 @@ COPY requirements.txt .
 RUN export PATH=$PATH:/home/appuser/.local/bin \
     && export PYTHONPATH=$PYTHONPATH:/app \
     && export PATH=$PATH:/app \
-    && pip install --trusted-host pypi.python.org -r requirements.txt --no-cache-dir
+    && pip install --trusted-host pypi.python.org -r requirements.txt --no-cache-dir \
+    && pip install --trusted-host pypi.python.org -r request_llm/requirements_newbing.txt --no-cache-dir \
+    && pip install --trusted-host pypi.python.org -r request_llm/requirements_moss.txt --no-cache-dir \
+    && pip install --trusted-host pypi.python.org -r request_llm/requirements_jittorllms.txt --no-cache-dir \
+    && pip install --trusted-host pypi.python.org -r request_llm/requirements_chatglm.txt --no-cache-dir
 
 # Use multistage build to create a separate build stage
 FROM base AS builder
